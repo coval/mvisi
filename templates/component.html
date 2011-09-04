@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+
+{% block menu %}
+	<ul id="menu">
+		<li><a class="current" href="/">Projects</a></li>
+		<li><a href="#">Packages</a></li>
+		<li class="last"><a href="#">Components</a></li>
+	</ul>
+{% endblock menu %}
+
+
+{% block content %}
+
+	
+	<div class="wrap">
+		<div id="main">
+
+				<h2><a href="/projects/">Component name: {{component.artifactId}}, version: {{component.version}}</a></h2>
+				<a href="/components/{{component.id}}/check/">>>check available other versions<<</a>
+
+				<p><h3>Available in packages:</h3></p>
+				<p>
+				<ul>
+					{% for c in component.package.all %}
+						<li>
+							{{c}}
+						</li>
+					{% endfor %}
+				</ul>
+				</p>
+
+				<h3>Changes in this version:</h3>
+				<div id="rel_note">
+					<p>{{release_notes|safe}}</p>
+				</div>
+				
+				<h3>Other versions:</h3>
+				<ul>
+				{% for comp in component.get_other_versions %}
+					<li>
+						<a href="/components/{{comp.id}}/">{{ comp.version }}</a>
+					</li>
+				{% endfor %}
+				</ul>
+				
+
+<!--				<p><a href="#">&raquo; Read More</a></p>-->
+
+		</div>
+		
+		
+		<div id="side">
+			<ul>
+				<li><a href="#"><strong>ArtifactId</strong></a><br />{{component.artifactId}}</li>
+				<li><a href="#"><strong>GroupId</strong></a><br />{{component.groupId}}</li>
+				<li><a href="#"><strong>Version</strong></a><br />{{component.version}}</li>
+				<li><a href="#"><strong>Revision</strong></a><br />{{component.revision}}</li>
+				<li><a href="#"><strong>Date</strong></a><br />{{component.date}}</li>
+				<li><a href="#"><strong>TagBase</strong></a><br />{{component.get_tag_base}}</li>
+			</ul>
+		</div>
+		
+
+		<div id="footer">
+			<p>Design: Pawel Kowalczyk</p>
+		</div>
+
+		
+	</div>	
+
+{% endblock content %}
+
+
+
+
+
