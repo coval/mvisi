@@ -2,105 +2,85 @@
 
 
 {% block menu %}
-	<ul id="menu">
 		<li><a class="current" href="/">Projects</a></li>
 		<li><a href="#">Packages</a></li>
 		<li class="last"><a href="#">Components</a></li>
-	</ul>
 {% endblock menu %}
 
 {% block content %}
 
+<div id="main">
+
+	<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}, Package name: {{package.version}}</a></h2>
+	<a href="/projects/{{project.id}}/packages/{{package.id}}/check/">>>>Check package and list dependencies<<<</a>
+
+	<div class="comp_table">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<thead>
+			<tr>
+				<th>ArtifactId</th>
+				{% if package.get_previous_package %}
+					<th>In {{ package.get_previous_package.version }}</th>
+				{% endif %}
+				<th>Current Version</th>
+				{% if package.get_next_package %}
+					<th>In {{ package.get_next_package.version}}</th>
+				{% endif %}
+				<th>Newest version</th>
+				
+			</tr>
+			</thead>
+			<tbody>
+			{% for component in components %}
+			<tr>
+				<td><a href="/components/{{component.id}}/">{{ component.artifactId }}</a></td>
+				{% if package.get_previous_package %}
+					<td>{% ifequal component.version component.in_previous.version %}
+						<center>=</center>
+						{% else %}
+						<a href="/components/{{component.in_previous.id}}/">{{ component.in_previous.version }}</a>
+						{% endifequal %}
+					</td>
+				{% endif %}
+				
+				<td>{{component.version}}</td>
+				
+				{% if package.get_next_package %}
+					<td>{% ifequal component.version component.in_next.version %}
+						<center>=</center>
+						{% else %}
+						<a href="/components/{{component.in_next.id}}/">{{ component.in_next.version }}</a>
+						{% endifequal %}
+					</td>
+				{% endif %}
+				
 	
-	<div class="wrap">
-		<div id="main">
+				<td>{% if not component.get_newest_component.version %}
+					<center>=</center>
+					{% else %}
+					<a href="/components/{{component.get_newest_component.id}}/">{{ component.get_newest_component.version }}</a>
+					{% endif %}
+				</td>
+			
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
 
-				<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}, Package name: {{package.version}}</a></h2>
-				<a href="/projects/{{project.id}}/packages/{{package.id}}/check/">>>>Check package and list dependencies<<<</a>
+<div id="right_release">
+	<h3>Changeset - changes from package: {{ package.get_previous_package }}</h3>
+	<div id="release_side">
+		<ul>
+		{% for elem in release_notes %}
+			<li>{{ elem }}</li>
+		{% endfor %}
+		</ul>
 
-				<div class="comp_table">
-				<table width="100%" cellspacing="0" cellpadding="0">
-					<thead>
-					<tr>
-						<th>ArtifactId</th>
-						{% if package.get_previous_package %}
-							<th>In {{ package.get_previous_package.version }}</th>
-						{% endif %}
-						<th>Current Version</th>
-						{% if package.get_next_package %}
-							<th>In {{ package.get_next_package.version}}</th>
-						{% endif %}
-						<th>Newest version</th>
-						
-					</tr>
-					</thead>
-					<tbody>
-					{% for component in components %}
-					<tr>
-						<td><a href="/components/{{component.id}}/">{{ component.artifactId }}</a></td>
-						{% if package.get_previous_package %}
-							<td>{% ifequal component.version component.in_previous.version %}
-								<center>=</center>
-								{% else %}
-								<a href="/components/{{component.in_previous.id}}/">{{ component.in_previous.version }}</a>
-								{% endifequal %}
-							</td>
-						{% endif %}
-						
-						<td>{{component.version}}</td>
-						
-						{% if package.get_next_package %}
-							<td>{% ifequal component.version component.in_next.version %}
-								<center>=</center>
-								{% else %}
-								<a href="/components/{{component.in_next.id}}/">{{ component.in_next.version }}</a>
-								{% endifequal %}
-							</td>
-						{% endif %}
-						
+	</div>
+</div>
 
-						<td>{% if not component.get_newest_component.version %}
-							<center>=</center>
-							{% else %}
-							<a href="/components/{{component.get_newest_component.id}}/">{{ component.get_newest_component.version }}</a>
-							{% endif %}
-						</td>
-					
-					</tr>
-					{% endfor %}
-					</tbody>
-				
-				</table>
-				</div>
-				
-				
-				
-
-		</div>
-		
-		<div id="right_release">
-			<h3>Changeset - changes from package: {{ package.get_previous_package }}</h3>
-			<div id="release_side">
-				<ul>
-				{% for elem in release_notes %}
-					<li>{{ elem }}</li>
-				{% endfor %}
-				</ul>
-				
-				
-				<!--<ul>
-					<li><a href="#">Esse cillum dolore</a><br />Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-					<li><a href="#">Esse cillum dolore</a><br />Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-					<li><a href="#">Esse cillum dolore</a><br />Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-					<li><a href="#">Esse cillum dolore</a><br />Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-				</ul>-->
-			</div>
-		</div>
-	
-		<div id="footer">
-			<p>Design: Pawel Kowalczyk</p>
-		</div>
-	</div>	
 
 {% endblock content %}
 

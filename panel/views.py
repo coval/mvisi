@@ -11,55 +11,11 @@ except:
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from panel.models import Configuration, Project, Component, Package
-
-import threading, re
-
-component_re = re.compile(r'(\d+ | [a-z]+ | \.| -)', re.VERBOSE)
-replace = {'pre':'c', 'preview':'c','-':'final-','rc':'c','dev':'@'}.get
-
-def _parse_version_parts(s):
-    for part in component_re.split(s):
-        part = replace(part,part)
-        if not part or part=='.':
-            continue
-        if part[:1] in '0123456789':
-            yield part.zfill(8)    # pad for numeric comparison
-        else:
-            yield '*'+part
-
-    yield '*final'  # ensure that alpha/beta/candidate are before final
-
-
-
-def parse_version(s):
-    parts = []
-    for part in _parse_version_parts(s.lower()):
-        if part.startswith('*'):
-            if part<'*final':   # remove '-' before a prerelease tag
-                while parts and parts[-1]=='*final-': parts.pop()
-            # remove trailing zeros from each series of numeric parts
-            while parts and parts[-1]=='00000000':
-                parts.pop()
-        parts.append(part)
-    return tuple(parts)
-
-
-def get_page(url, conf_id=1):
-    conf = Configuration.objects.get(id=conf_id)
-    username = conf.username
-    password = conf.password
-    
-    req = urllib2.Request(url)
-    base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
-    req.add_header("Authorization", "Basic %s" % base64string)
-    response = urllib2.urlopen(req)
-    the_page = response.read()
-    response.close()
-    return the_page
+from panel.utils import parse_version, get_page
 
 
 def package_available_versions(request, project_id=1):
-    """ Sprawdza dostepne wersje projektu """
+    """ Checks available project versions """
     project = Project.objects.get(id=int(project_id))
     page = get_page(project.get_mvn_metadata_url())
     soup = BeautifulSoup(page)
@@ -77,7 +33,7 @@ def package_available_versions(request, project_id=1):
 
 
 def check_package(request, project_id=1, package_id=1):
-    """ Sprawdza zaleznosci paczki, tworzy obiekty komponentow"""
+    """ Check package dependencies """
     project_id = int(project_id)
     package_id = int(package_id)
     project = Project.objects.get(id=project_id)
@@ -118,21 +74,21 @@ def check_package(request, project_id=1, package_id=1):
 
 
 def check_available_components(request, component_id=1):
-    """ Sprawdza liste dostepnych komponentow """
+    """ Check component list """
     component_id = int(component_id)
     component = Component.objects.get(id=component_id)
     component.check_available_components()
     return HttpResponseRedirect('/components/%s/'%component_id)
 
 def projects_main(request):
-    "Lista projektow"
+    "Project list "
     c = dict()
     c['projects'] = Project.objects.all()
     
     return render_to_response('projects.html', c)
 
 def project_view(request, project_id=1):
-    " Widok projektu"
+    " Main project view"
     c = dict()
     project = Project.objects.get(id=int(project_id))
     c['project'] = project
@@ -142,7 +98,7 @@ def project_view(request, project_id=1):
     
     
 def show_package(request, project_id, package_id):
-    "pokazuje paczke i liste jej komponentow"
+    "package view"
     c = dict()
     log_message = set()
     project = Project.objects.get(id=int(project_id))
@@ -179,7 +135,7 @@ def show_package(request, project_id, package_id):
     return render_to_response('package.html', c)
 
 def component_info(request, component_id):
-    "Info o komponencie"
+    "Component info"
     c = dict()
     component_id = int(component_id)
     component = Component.objects.get(id=component_id)

@@ -1,7 +1,6 @@
 from django.db import models
 import base64, datetime
 from operator import itemgetter, attrgetter
-
 try:
     from BeautifulSoup import BeautifulSoup
 except:
@@ -21,20 +20,7 @@ class Configuration(models.Model):
     filter = models.CharField(max_length=32, blank=True)
 
     def __unicode__(self):
-        return "Podstawowy konfig"
-
-
-# Create your models here.
-def get_login( *some_vars ):
-    #ToDo: better password corelation with proper configurations
-    conf = Configuration.objects.get(id=1)
-    username = conf.username
-    password = conf.password
-    return True, username, password, True
-
-
-def ssl_server_trust_prompt( *some_vars ):
-    return True, 1, True
+        return "Base config"
 
 
 class Project(models.Model):
@@ -74,26 +60,22 @@ class Package(models.Model):
         url = proj_url + "/" + self.version + "/" + self.project.artifactId + "-" + self.version + ".pom"
         return url
     
+    
+    def get_other_package(self, factor=1):
+        new_version = self.version.split('.')
+        try:
+            new_suffix = int(new_version[-1]) + factor
+            new_version = '.'.join(new_version[:-1]) + '.' + str(new_suffix)
+            new_version = Package.objects.get(version=new_version)
+        except Exception, e:
+            new_version = ''
+        return new_version
+    
     def get_previous_package(self):
-        new_version = self.version.split('.')
-        try:
-            new_suffix = int(new_version[-1]) - 1
-            new_version = '.'.join(new_version[:-1]) + '.' + str(new_suffix)
-            new_version = Package.objects.get(version=new_version)
-        except Exception, e:
-            new_version = ''
-        return new_version
-        
+        return self.get_other_package(factor = -1)
+
     def get_next_package(self):
-        #ToDo: refactor
-        new_version = self.version.split('.')
-        try:
-            new_suffix = int(new_version[-1]) + 1
-            new_version = '.'.join(new_version[:-1]) + '.' + str(new_suffix)
-            new_version = Package.objects.get(version=new_version)
-        except Exception, e:
-            new_version = ''
-        return new_version
+        return self.get_other_package(factor = 1)
 
 
 class Component(models.Model):
@@ -113,7 +95,7 @@ class Component(models.Model):
         pom_url = self.get_mvn_pom_url()
         
         def find_tagbase(pom):
-            from panel.views import get_page
+            from panel.utils import get_page
             if self.tagbase:
                 return
             print(pom)
@@ -124,7 +106,7 @@ class Component(models.Model):
                 try:
                     version = soup.project.find('parent').version.string if soup.project.find('parent').version.string else soup.project.version.string
                 except Exception, e:
-                    print("Sie zjebalo: %s"%e)
+                    print("Some error: %s"%e)
                     return ''
                 artifactid = soup.project.find('parent').artifactid.string
                 groupid = soup.project.find('parent').groupid.string
@@ -155,6 +137,7 @@ class Component(models.Model):
         return self.tagbase + "/" + module_name + '-' + self.version
     
     def get_svn_revision(self):
+        from panel.utils import get_login, ssl_server_trust_prompt
         client = pysvn.Client()
         client.callback_get_login = get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
@@ -168,6 +151,7 @@ class Component(models.Model):
 
     def get_svn_previous_revision(self):
         "Revision of previously released component"
+        from panel.utils import get_login, ssl_server_trust_prompt
         client = pysvn.Client()
         client.callback_get_login = get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
@@ -180,6 +164,8 @@ class Component(models.Model):
         return info[0][1]['last_changed_rev'].number
 
     def compage_revisions(self, old_revision, new_revision):
+        from panel.utils import get_login, ssl_server_trust_prompt
+        
         tag = self.get_svn_tag()
         tag = tag.replace('tags','trunk').split('/')[:-1]
         svnpath = '/'.join(tag)
@@ -216,13 +202,13 @@ class Component(models.Model):
                     self.release_notes = log_message
                     self.save()
             except Exception, e:
-                print("Cos nie tak: %s"%e)
+                print("Error in getting release note: %s"%e)
                 return ""
         
         return self.release_notes
 
     def check_available_components(self):
-        from panel.views import get_page
+        from panel.utils import get_page
         page = get_page(self.get_mvn_metadata_url())
         soup = BeautifulSoup(page)
         versions = soup.findAll('version')
@@ -261,7 +247,10 @@ class Component(models.Model):
         from panel.views import parse_version
         components = []
         comp = Component.objects.filter(artifactId=self.artifactId)
-        #components = [c.version for c in comp if c.version != self.version]
+        #try:
+        #    components = [c.version for c in comp if c.version != self.version]
+        #except Exception, e:
+        #    print e, components
         for c in comp:
             if c.version != self.version:
                 components.append(c)

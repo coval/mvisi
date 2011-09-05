@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     #(r'^components/$', 'panel.views.components'),
     
     (r'^$', 'panel.views.projects_main'),
-#    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
-#        {'document_root': '/home/coval/visi/static'}),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': '/home/pawel/visi/static'}),
    
 )
