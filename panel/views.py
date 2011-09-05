@@ -143,13 +143,14 @@ def component_info(request, component_id):
     if not component.tagbase:
         component.get_tag_base()
         
-    log_ob = component.get_release_note()
+    log_ob = component.get_release_note().splitlines()
     
     formatted_release_note = ''
-    for log in log_ob.splitlines():
-        formatted_release_note += "%s <br />"%log
-    
-    c['release_notes'] = formatted_release_note
+    #for log in log_ob.splitlines():
+    #    formatted_release_note += "%s <br />"%log
+    #
+    #c['release_notes'] = formatted_release_note
+    c['release_notes'] = log_ob
 
     return render_to_response('component.html', c)
     
