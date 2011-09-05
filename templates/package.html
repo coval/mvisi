@@ -12,7 +12,12 @@
 <div id="main">
 
 	<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}</a><span id=package_version>Package version: {{package.version}}</span></h2>
-	<a href="/projects/{{project.id}}/packages/{{package.id}}/check/">>>>Check package and list dependencies<<<</a>
+	<div id="button_layer">
+        <div id="refresh_button">
+            <a href="/projects/{{project.id}}/packages/{{package.id}}/check/">>>>Check package and list dependencies<<<</a>
+        </div>
+	</div>
+
 
 	<div class="comp_table">
 		<table width="100%" cellspacing="0" cellpadding="0">

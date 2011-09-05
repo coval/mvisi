@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 import base64, datetime
 from operator import itemgetter, attrgetter
@@ -38,10 +39,12 @@ class Project(models.Model):
     def get_mvn_url(self):
         conf = Configuration.objects.get(id=1)
         return conf.mvnroot + self.mvnpath
-        
-    
+
     def get_mvn_metadata_url(self):
         return self.get_mvn_url() + "/maven-metadata.xml"
+    
+    def get_absolute_url(self):
+        return ''
 
 class Package(models.Model):
     project = models.ForeignKey(Project)
@@ -54,6 +57,9 @@ class Package(models.Model):
     
     def __unicode__(self):
         return "%s - %s"%(self.project.name, self.version)
+    
+    def get_absolute_url(self):
+        return ''
     
     def get_mvn_pom_url(self):
         proj_url = self.project.get_mvn_url()
@@ -89,6 +95,9 @@ class Component(models.Model):
     revision = models.IntegerField(null=True)
     date = models.DateField(null=True)
     release_notes = models.TextField(max_length=2500, blank=True) #ToDo: zmienic na pole
+
+    def get_absolute_url(self):
+        return ''
 
     def get_tag_base(self):
         conf = Configuration.objects.get(id=1)

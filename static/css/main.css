@@ -71,8 +71,9 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
  
 #package_version { float: right; padding-right: 35px; }
 #comp_version { float: right; }
-#refresh_button { float: right; }
-
+#refresh_button { left: 415px; position: relative }
+#refresh_comp_button { float: right }
+#button_layer { float: none; }
 
 
 

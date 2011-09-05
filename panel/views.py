@@ -1,4 +1,4 @@
-# Create your views here.
+# -*- coding: utf-8 -*-
 
 import urllib, urllib2, base64
 try:
@@ -22,7 +22,6 @@ def package_available_versions(request, project_id=1):
     versions = soup.findAll('version')
     for version in versions:
         package, created = Package.objects.get_or_create(version=version.string, project=project)
-        package.save()
     artifactId = soup.find('artifactid')
     groupId = soup.find('groupid')
     if not project.artifactId or not project.groupId:
@@ -144,14 +143,7 @@ def component_info(request, component_id):
         component.get_tag_base()
         
     log_ob = component.get_release_note().splitlines()
-    
-    formatted_release_note = ''
-    #for log in log_ob.splitlines():
-    #    formatted_release_note += "%s <br />"%log
-    #
-    #c['release_notes'] = formatted_release_note
     c['release_notes'] = log_ob
-
     return render_to_response('component.html', c)
     
     
