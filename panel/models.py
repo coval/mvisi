@@ -13,15 +13,15 @@ except:
 
 
 class Configuration(models.Model):
-    svnroot = models.CharField(max_length=256, help_text='')
-    mvnroot = models.CharField(max_length=256)
-    username = models.CharField(max_length=32, blank=True)
-    password = models.CharField(max_length=32, blank=True)
+    svnroot = models.CharField(max_length=256, help_text='Root path ex.: https://your_company/your_project/')
+    mvnroot = models.CharField(max_length=256, help_text='Root path ex.: https://your_company/your_project/releases/')
+    username = models.CharField(max_length=32, blank=True, help_text='Username for authorization to svn and maven repo')
+    password = models.CharField(max_length=32, blank=True, help_text='Password for authorization to svn and maven repo')
     tempdir = models.CharField(max_length=32, blank=True)
     filter = models.CharField(max_length=32, blank=True)
 
     def __unicode__(self):
-        return "Base config"
+        return "Config: %s"%self.id
 
 
 class Project(models.Model):
@@ -37,8 +37,8 @@ class Project(models.Model):
         return self.name
     
     def get_mvn_url(self):
-        #conf = self.configuration
-        conf = Configuration.objects.get(id=1)
+        conf = self.configuration
+        #conf = Configuration.objects.get(id=1)
         return conf.mvnroot + self.mvnpath
 
     def get_mvn_metadata_url(self):
