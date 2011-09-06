@@ -11,20 +11,34 @@
 
 	
 <div id="main">
-	<div class="l">
-		<h2><a href="/projects/">Project name: {{project.name}}</a></h2>
-		<a href="/projects/{{project.id}}/check/">>>>Check available packages<<<</a>
-		<p><h3>List of Packages</h3></p>
-		
-		<ul>
-		{% for package in packages %}
-			<li>
-				<h4><a href="/projects/{{project.id}}/packages/{{package.id}}/">{{ package.version }}</a></h4>
-					{{ package.description }}
-			</li>
-		{% endfor %}
-		</ul>
+
+	<h2><a href="/projects/">Project name: {{project.name}}</a></h2>
+	<a href="/projects/{{project.id}}/check/">>>>Check available packages<<<</a>
+	<p><h2>List of Packages</h2></p>
+	<div class="package_table">
+		<table width="100%" cellspacing="0" cellpadding="0">
+			<thead>
+				<tr>
+					<th><h3>Version</h3></th>
+					<th><h3>Release Date</h3></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for package in packages %}
+				<tr>
+					<td>
+						<h3><a href="{{ package.get_absolute_url }}">{{ package.version }}</a></h3>
+					</td>
+					<td>
+						{{ package.get_svn_date }}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 	</div>
+		
+
 </div>
 		
 		

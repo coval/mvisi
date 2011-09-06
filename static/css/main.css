@@ -29,7 +29,7 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
 
 .line { clear: both; border-bottom: 1px dotted #ccc; padding: 10px 0 0; margin: 0 0 20px; }
 
-#side { float: right; width: 225px; color: #808080; background: #fff; padding: 11px; margin: 0 0 20px; }
+#side { float: right; width: 300px; color: #808080; background: #fff; padding: 11px; margin: 0 0 20px; }
 #side a { color: #444; }
 #side li { padding: 0 0 10px; }
 
@@ -68,7 +68,12 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
 /* .comp_table table tr td.last { border-right: none;  }*/
  .comp_table table tr td.count { text-align: center; }
  .comp_table table tr td a { color: #; }
- 
+
+
+ .package_table { width: 50%; padding: 0; margin: 10px 10px 10px 0px;}
+ .package_table table tbody tr td { padding: 2px 0 0 35px; }
+ .package_table table thead tr th { padding: 2px 0 0 28px; text-align: justify;}
+
 #package_version { float: right; padding-right: 35px; }
 #comp_version { float: right; }
 #refresh_button { left: 415px; position: relative }

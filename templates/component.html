@@ -13,15 +13,17 @@
 <div id="main">
 
 	<h2><a href="/projects/">Component name: {{component.artifactId}}</a><span id="comp_version"> Version: {{component.version}}</span></h2>
-	<div id="refresh_comp_button"><a id="ref_but" href="/components/{{component.id}}/check/#">>>check available other versions<<</a></div>
+	<div id="refresh_comp_button">
+		<a id="ref_but" href="{{component.get_absolute_url}}check/#">>>check available other versions<<</a>
+	</div>
 
 	<p><h3>Available in packages:</h3></p>
 	
 	<p>
 		<ul>
-			{% for c in component.package.all %}
+			{% for package in component.package.all %}
 				<li>
-					<a href="/projects/{{c.project.id}}/packages/{{c.id}}/">{{c}}</a>
+					<a href="{{package.get_absolute_url}}">{{package}}</a>
 				</li>
 			{% endfor %}
 		</ul>
@@ -43,7 +45,7 @@
 	<ul>
 	{% for comp in component.get_other_versions %}
 		<li>
-			<a href="/components/{{comp.id}}/">{{ comp.version }}</a>
+			<a href="{{comp.get_absolute_url}}">{{ comp.version }}</a>
 		</li>
 	{% endfor %}
 	</ul>

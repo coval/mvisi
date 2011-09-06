@@ -37,6 +37,7 @@ class Project(models.Model):
         return self.name
     
     def get_mvn_url(self):
+        #conf = self.configuration
         conf = Configuration.objects.get(id=1)
         return conf.mvnroot + self.mvnpath
 
@@ -44,7 +45,8 @@ class Project(models.Model):
         return self.get_mvn_url() + "/maven-metadata.xml"
     
     def get_absolute_url(self):
-        return ''
+        return "/projects/%s/"%self.id
+
 
 class Package(models.Model):
     project = models.ForeignKey(Project)
@@ -53,13 +55,39 @@ class Package(models.Model):
     tagbase = models.CharField(max_length=256, blank=True)
     mvnpath = models.CharField(max_length=256, blank=True)
     valid = models.CharField(max_length=256, blank=True)
+    date = models.DateField(null=True)
     plaftorm_installation = models.CharField(max_length=256, blank=True)
     
     def __unicode__(self):
         return "%s - %s"%(self.project.name, self.version)
     
     def get_absolute_url(self):
-        return ''
+        return "/projects/%s/packages/%s/"%(self.project.id, self.id)
+
+    def get_tag_base(self):
+        from panel.utils import find_tagbase
+        pom_url = self.get_mvn_pom_url()
+        return find_tagbase(pom_url, self)
+
+
+    def get_svn_tag(self):
+        module_name = self.tagbase.split('/')[-1]
+        return self.tagbase + "/" + self.project.artifactId + '-' + self.version
+    
+    def get_svn_date(self):
+        if self.date:
+            return self.date
+        from panel.utils import get_login, ssl_server_trust_prompt
+        client = pysvn.Client()
+        client.callback_get_login = get_login
+        client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
+        info = client.info2(self.get_svn_tag()+"/"+"pom.xml")
+        self.revision = info[0][1]['last_changed_rev'].number
+        date = info[0][1]['last_changed_date']
+        self.date = datetime.date.fromtimestamp(date)
+        self.save()
+        return self.date
+
     
     def get_mvn_pom_url(self):
         proj_url = self.project.get_mvn_url()
@@ -97,36 +125,15 @@ class Component(models.Model):
     release_notes = models.TextField(max_length=2500, blank=True) #ToDo: zmienic na pole
 
     def get_absolute_url(self):
-        return ''
+        return "/components/%s/"%self.id
 
     def get_tag_base(self):
+        from panel.utils import find_tagbase
+        #conf = self.package.project.configuration
         conf = Configuration.objects.get(id=1)
         pom_url = self.get_mvn_pom_url()
         
-        def find_tagbase(pom):
-            from panel.utils import get_page
-            if self.tagbase:
-                return
-            print(pom)
-            page = get_page(pom)
-            soup = BeautifulSoup(page)
-            tagbase = soup.find('tagbase')
-            if not tagbase:
-                try:
-                    version = soup.project.find('parent').version.string if soup.project.find('parent').version.string else soup.project.version.string
-                except Exception, e:
-                    print("Some error: %s"%e)
-                    return ''
-                artifactid = soup.project.find('parent').artifactid.string
-                groupid = soup.project.find('parent').groupid.string
-                if not artifactid:
-                    return ''
-                new_pom = conf.mvnroot + groupid.replace('.','/') + '/' + artifactid + '/' + version + "/" + artifactid + "-" + version + ".pom"
-                find_tagbase(new_pom)
-            else:
-                self.tagbase = tagbase.string
-                self.save()
-        find_tagbase(pom_url)
+        find_tagbase(pom_url, self)
         return self.tagbase.replace(conf.svnroot,'')
 
     
@@ -142,6 +149,7 @@ class Component(models.Model):
         return self.get_mvn_url() + "/" + self.version + "/" + self.artifactId + "-" + self.version + ".pom"
         
     def get_svn_tag(self):
+        #return self.tagbase + "/" + self.project.artifactId + '-' + self.version
         module_name = self.tagbase.split('/')[-1]
         return self.tagbase + "/" + module_name + '-' + self.version
     

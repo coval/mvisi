@@ -14,7 +14,7 @@
 	<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}</a><span id=package_version>Package version: {{package.version}}</span></h2>
 	<div id="button_layer">
         <div id="refresh_button">
-            <a href="/projects/{{project.id}}/packages/{{package.id}}/check/">>>>Check package and list dependencies<<<</a>
+            <a href="{{ package.get_absolute_url}}check/">>>>Check package and list dependencies<<<</a>
         </div>
 	</div>
 
@@ -22,28 +22,28 @@
 	<div class="comp_table">
 		<table width="100%" cellspacing="0" cellpadding="0">
 			<thead>
-			<tr>
-				<th>ArtifactId</th>
-				{% if package.get_previous_package %}
-					<th>Previous package<br /><a href="/projects/{{project.id}}/packages/{{package.get_previous_package.id}}/">({{ package.get_previous_package.version }})</a></th>
-				{% endif %}
-				<th>Current package<br />({{ package.version}})</th>
-				{% if package.get_next_package %}
-					<th>Next package<br /><a href="/projects/{{project.id}}/packages/{{package.get_next_package.id}}/">({{ package.get_next_package.version}})</a></th>
-				{% endif %}
-				<th>Newest<br />component version</th>
-				
-			</tr>
+				<tr>
+					<th>ArtifactId</th>
+					{% if package.get_previous_package %}
+						<th>Previous package<br /><a href="{{package.get_previous_package.get_absolute_url}}">({{ package.get_previous_package.version }})</a></th>
+					{% endif %}
+					<th>Current package<br />({{ package.version}})</th>
+					{% if package.get_next_package %}
+						<th>Next package<br /><a href="{{package.get_next_package.get_absolute_url}}">({{ package.get_next_package.version}})</a></th>
+					{% endif %}
+					<th>Newest<br />component version</th>
+					
+				</tr>
 			</thead>
 			<tbody>
 			{% for component in components %}
 			<tr>
-				<td><a href="/components/{{component.id}}/">{{ component.artifactId }}</a></td>
+				<td><a href="{{component.get_absolute_url}}">{{ component.artifactId }}</a></td>
 				{% if package.get_previous_package %}
 					<td>{% ifequal component.version component.in_previous.version %}
 						<center title="{{component.version}}">=</center>
 						{% else %}
-						<a href="/components/{{component.in_previous.id}}/">{{ component.in_previous.version }}</a>
+						<a href="{{component.in_previous.get_absolute_url}}">{{ component.in_previous.version }}</a>
 						{% endifequal %}
 					</td>
 				{% endif %}
@@ -54,7 +54,7 @@
 					<td>{% ifequal component.version component.in_next.version %}
 						<center title="{{component.version}}">=</center>
 						{% else %}
-						<a href="/components/{{component.in_next.id}}/">{{ component.in_next.version }}</a>
+						<a href="{{component.in_next.get_absolute_url}}">{{ component.in_next.version }}</a>
 						{% endifequal %}
 					</td>
 				{% endif %}
@@ -63,7 +63,7 @@
 				<td>{% if not component.get_newest_component.version %}
 					<center title="{{component.version}}">=</center>
 					{% else %}
-					<a href="/components/{{component.get_newest_component.id}}/">{{ component.get_newest_component.version }}</a>
+					<a href="{{component.get_newest_component.get_absolute_url}}">{{ component.get_newest_component.version }}</a>
 					{% endif %}
 				</td>
 			
