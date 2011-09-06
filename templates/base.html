@@ -54,6 +54,21 @@ $(document).ready(function() {
             }
         });
     });
+    
+    $("#release_side ul li a").click(function() {
+        var classes = $(this).attr("class");
+        classes = classes.split(" ").join(".");
+        //alert(classes);
+        zm = "." + classes;
+        //$(this).addClass("red");
+        $("a").removeClass("red");
+        $(zm).addClass("red");
+        //alert(attr);  
+        
+    });
+    
+    
+    
  });
 		
 </script>

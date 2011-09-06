@@ -38,7 +38,7 @@
 			<tbody>
 			{% for component in components %}
 			<tr>
-				<td><a href="{{component.get_absolute_url}}">{{ component.artifactId }}</a></td>
+				<td><a class="rn_{{component.id}}" href="{{component.get_absolute_url}}">{{ component.artifactId }}</a></td>
 				{% if package.get_previous_package %}
 					<td>{% ifequal component.version component.in_previous.version %}
 						<center title="{{component.version}}">=</center>
@@ -78,11 +78,10 @@
 	<h3>Changeset - changes from previous package: ({{ package.get_previous_package }})</h3>
 	<div id="release_side">
 		<ul>
-		{% for elem in release_notes %}
-			<li>{{ elem }}</li>
+		{% for elem, rn in release_notes.items %}
+			<li><a class="{{rn}}" href="#">{{ elem }}</a></li>
 		{% endfor %}
 		</ul>
-
 	</div>
 </div>
 

@@ -12,7 +12,7 @@ except:
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from panel.models import Configuration, Project, Component, Package
-from panel.utils import parse_version, get_page
+from panel.utils import parse_version, get_page, RNObject
 
 
 def package_available_versions(request, project_id=1):
@@ -101,6 +101,7 @@ def show_package(request, project_id, package_id):
     "package view"
     c = dict()
     log_message = set()
+    new_messages = {}
     project = Project.objects.get(id=int(project_id))
     package = Package.objects.get(id=int(package_id))
     previous_package = package.get_previous_package()
@@ -120,16 +121,29 @@ def show_package(request, project_id, package_id):
         if step > 1:
             for ind in range(index_curr +1, index_prev):
                 for line in all_components[ind].get_release_note().splitlines():
-                    if not "[maven-release-plugin]" in line and line != '': log_message.add(line)
+                    if not "[maven-release-plugin]" in line and line != '':
+                        log_message.add(line)
+                        if new_messages.has_key(line):
+                            ids = new_messages[line]
+                            new_messages[line] = "%s rn_%s"%(ids, all_components[ind].id)
+                        else:
+                            new_messages[line] = "rn_%s"%all_components[ind].id
+                            
         
         if previous_package not in component.package.all():
             for line in component.release_notes.splitlines():
-                if not "[maven-release-plugin]" in line and line != '': log_message.add(line)
+                if not "[maven-release-plugin]" in line and line != '':
+                    log_message.add(line)
+                    if new_messages.has_key(line):
+                        ids = new_messages[line]
+                        new_messages[line] = "%s rn_%s"%(ids, all_components[ind].id)
+                    else:
+                        new_messages[line] = "rn_%s"%all_components[ind].id
         
     c['project'] = project
     c['package'] = package
     c['components'] = new_components
-    c['release_notes'] = log_message
+    c['release_notes'] = new_messages
     c['previous_package'] = previous_package
     
     return render_to_response('package.html', c)

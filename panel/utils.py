@@ -11,6 +11,13 @@ from panel.models import Configuration, Project, Component, Package
 component_re = re.compile(r'(\d+ | [a-z]+ | \.| -)', re.VERBOSE)
 replace = {'pre':'c', 'preview':'c','-':'final-','rc':'c','dev':'@'}.get
 
+
+class RNObject(object):
+    def __init__(self, line, id):
+        self.line = line
+        self.id = id
+
+
 def _parse_version_parts(s):
     for part in component_re.split(s):
         part = replace(part,part)
