@@ -1,0 +1,4 @@
+*.pyc
+local_settings.py
+panel/fixtures/
+db_file
