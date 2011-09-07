@@ -55,20 +55,17 @@ $(document).ready(function() {
         });
     });
     
-    $("#release_side ul li a").click(function() {
+    $("#release_side ul li").hover(function() {
         var classes = $(this).attr("class");
-        classes = classes.split(" ").join(".");
-        //alert(classes);
+        classes = classes.split(" ").join(",.");
         zm = "." + classes;
-        //$(this).addClass("red");
-        $("a").removeClass("red");
-        $(zm).addClass("red");
-        //alert(attr);  
-        
+		$("#release_side ul li").removeClass("blue");
+        $(this).addClass("blue");
+		
+        $("td").filter(".artid").removeClass("yellow");
+		$("td").filter(".artid").filter(zm).addClass("yellow");
+        //alert(zm);  
     });
-    
-    
-    
  });
 		
 </script>

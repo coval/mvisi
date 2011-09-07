@@ -122,23 +122,23 @@ def show_package(request, project_id, package_id):
             for ind in range(index_curr +1, index_prev):
                 for line in all_components[ind].get_release_note().splitlines():
                     if not "[maven-release-plugin]" in line and line != '':
-                        log_message.add(line)
                         if new_messages.has_key(line):
                             ids = new_messages[line]
-                            new_messages[line] = "%s rn_%s"%(ids, all_components[ind].id)
+                            new_messages[line].append(all_components[ind])
+                            #new_messages[line] = "%s rn_%s"%(ids, all_components[ind].id)
                         else:
-                            new_messages[line] = "rn_%s"%all_components[ind].id
+                            #new_messages[line] = "rn_%s"%all_components[ind].id
+                            new_messages[line] = [all_components[ind],]
                             
         
         if previous_package not in component.package.all():
             for line in component.release_notes.splitlines():
                 if not "[maven-release-plugin]" in line and line != '':
-                    log_message.add(line)
                     if new_messages.has_key(line):
                         ids = new_messages[line]
-                        new_messages[line] = "%s rn_%s"%(ids, all_components[ind].id)
+                        new_messages[line].append(component)
                     else:
-                        new_messages[line] = "rn_%s"%all_components[ind].id
+                        new_messages[line] = [component,]
         
     c['project'] = project
     c['package'] = package

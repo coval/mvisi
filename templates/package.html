@@ -38,7 +38,7 @@
 			<tbody>
 			{% for component in components %}
 			<tr>
-				<td><a class="rn_{{component.id}}" href="{{component.get_absolute_url}}">{{ component.artifactId }}</a></td>
+				<td class="artid rn_{{component.id}}"><a href="{{component.get_absolute_url}}">{{ component.artifactId }}</a></td>
 				{% if package.get_previous_package %}
 					<td>{% ifequal component.version component.in_previous.version %}
 						<center title="{{component.version}}">=</center>
@@ -48,7 +48,7 @@
 					</td>
 				{% endif %}
 				
-				<td>{{component.version}}</td>
+				<td class="artid rn_{{component.id}}">{{component.version}}</td>
 				
 				{% if package.get_next_package %}
 					<td>{% ifequal component.version component.in_next.version %}
@@ -78,8 +78,10 @@
 	<h3>Changeset - changes from previous package: ({{ package.get_previous_package }})</h3>
 	<div id="release_side">
 		<ul>
-		{% for elem, rn in release_notes.items %}
-			<li><a class="{{rn}}" href="#">{{ elem }}</a></li>
+		{% for elem, components in release_notes.items %}
+			<li class="{% for component in components %}rn_{{component.id}} {% endfor %}" title="Commit from: {% for component in components %}{{component.artifactId}}:{{component.version}} {% endfor %} ">
+				{{ elem }}
+			</li>
 		{% endfor %}
 		</ul>
 	</div>
