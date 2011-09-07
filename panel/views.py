@@ -32,7 +32,24 @@ def package_available_versions(request, project_id=1):
     return HttpResponseRedirect('/projects/%s/'%project_id)
 
 
+
+def ajax_check_package(request):
+    if request.GET:
+        project_id = request.GET.get('project_id','')
+        package_id = request.GET.get('package_id','')
+        project_id = int(project_id)
+        package_id = int(package_id)
+        
+    check_package_inner(request, project_id, package_id)
+    return HttpResponse("OK")
+
+
 def check_package(request, project_id=1, package_id=1):
+    check_package_inner(request, project_id, package_id)
+    return HttpResponseRedirect('/projects/%s/packages/%s/'%(project_id, package_id))
+    
+
+def check_package_inner(request, project_id=1, package_id=1):
     """ Check package dependencies """
     project_id = int(project_id)
     package_id = int(package_id)
@@ -70,8 +87,19 @@ def check_package(request, project_id=1, package_id=1):
             
             #ToDo: wyniesc to do ajaxa
             component.check_available_components()
-    return HttpResponseRedirect('/projects/%s/packages/%s/'%(project_id, package_id))
+    return 
+    #return HttpResponseRedirect('/projects/%s/packages/%s/'%(project_id, package_id))
 
+
+
+def ajax_check_available_components(request):
+    if request.GET:
+        component_id = request.GET.get('component_id','')
+        if component_id:
+            component_id = int(component_id)
+            component = Component.objects.get(id=component_id)
+            component.check_available_components()
+    return HttpResponse(component_id)
 
 def check_available_components(request, component_id=1):
     """ Check component list """

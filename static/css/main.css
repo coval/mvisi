@@ -35,7 +35,7 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
 
 #right_release { float: right;}
 
-#release_side { float: right; width: 480px; background: #fff; padding: 15px 5px 15px 35px; margin: 0 0 20px; }
+#release_side { position: relative; float: right; width: 480px; background: #fff; padding: 15px 5px 15px 35px; margin: 0 0 20px; }
 #release_side a { color: #444; }
 #release_side li { padding: 0 0 0px; list-style: decimal }
 #rel_note { padding: 0px 0px 0px 15px; }
@@ -76,13 +76,14 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
 
  .yellow { background-color: yellow;}
  .blue { background-color: #e5e9f3;}
-
+ .tip_text { position: absolute; top: 0; right:0; color: #808080;}
+ 
 #package_version { float: right; padding-right: 35px; }
 #comp_version { float: right; }
-#refresh_button { left: 415px; position: relative }
-#refresh_comp_button { float: right }
+#refresh_button { left: 415px; position: relative; }
+#refresh_comp_button { float: right; }
 #button_layer { float: none; }
-
+.loading_space { display: none;}
 
 
 

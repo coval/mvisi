@@ -11,10 +11,11 @@
 {% block content %}
 	
 <div id="main">
-
 	<h2><a href="/projects/">Component name: {{component.artifactId}}</a><span id="comp_version"> Version: {{component.version}}</span></h2>
 	<div id="refresh_comp_button">
-		<a id="ref_but" href="{{component.get_absolute_url}}check/#">>>check available other versions<<</a>
+		<a id="refresh_component" href="#">check available other versions>>></a>
+		<div class="loading_space">Loading data...</div>
+		<div class="result"></div>
 	</div>
 
 	<p><h3>Available in packages:</h3></p>
@@ -42,13 +43,15 @@
 	</div>
 	
 	<h3>Other versions of {{component.artifactId}}:</h3>
-	<ul>
-	{% for comp in component.get_other_versions %}
-		<li>
-			<a href="{{comp.get_absolute_url}}">{{ comp.version }}</a>
-		</li>
-	{% endfor %}
-	</ul>
+	<div class="other_components">
+		<ul>
+		{% for comp in component.get_other_versions %}
+			<li>
+				<a href="{{comp.get_absolute_url}}">{{ comp.version }}</a>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
 </div>
 
 
@@ -62,7 +65,10 @@
 		<li><a href="#"><strong>TagBase:</strong></a><br />{{component.get_tag_base}}</li>
 	</ul>
 </div>
-		
+
+<script type="text/javascript">
+	var comp_id={{ component.id }}
+</script>
 
 {% endblock content %}
 

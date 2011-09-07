@@ -21,8 +21,15 @@ urlpatterns = patterns('',
     #(r'^projects/(?P<project_id>\d+)/packages/$', 'panel.views.packages'),
     (r'^projects/', 'panel.views.projects_main'),
     (r'^components/(?P<component_id>\d+)/check/$', 'panel.views.check_available_components'),
+    
     (r'^components/(?P<component_id>\d+)/$', 'panel.views.component_info'),
     #(r'^components/$', 'panel.views.components'),
+    
+    # Ajax
+    (r'^ajax/component/check/$', 'panel.views.ajax_check_available_components'),
+    (r'^ajax/package/check/$', 'panel.views.ajax_check_package'),
+    
+    
     
     (r'^$', 'panel.views.projects_main'),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve',

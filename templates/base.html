@@ -45,27 +45,49 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $("#ref_but").click(function() {
+    $("#refresh_component").click(function() {
+		$(".loading_space").show()
 		$.ajax({
-		url: 'ajax/test.html',
+		url: '/ajax/component/check/',
+		data: {'component_id': comp_id },
 		success: function(data) {
-			$('.result').html(data);
-			alert('Load was performed.');
+			//$(".loading_space").hide()
+			//$('.result').html(data);
+			location.reload();
             }
         });
     });
+	
+	
+	$("#refresh_package").click(function() {
+		$(".loading_space").show()
+		$.ajax({
+		url: '/ajax/package/check/',
+		data: {'project_id': project_id, 'package_id': project_id },
+		success: function(data) {
+			//$(".loading_space").hide()
+			//$('.result').html(data);
+			location.reload();
+            }
+        });
+    });
+	
+	
     
+	
+	
     $("#release_side ul li").hover(function() {
         var classes = $(this).attr("class");
         classes = classes.split(" ").join(",.");
         zm = "." + classes;
 		$("#release_side ul li").removeClass("blue");
         $(this).addClass("blue");
-		
         $("td").filter(".artid").removeClass("yellow");
 		$("td").filter(".artid").filter(zm).addClass("yellow");
-        //alert(zm);  
     });
+	
+	
+	
  });
 		
 </script>

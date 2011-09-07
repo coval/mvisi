@@ -14,7 +14,8 @@
 	<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}</a><span id=package_version>Package version: {{package.version}}</span></h2>
 	<div id="button_layer">
         <div id="refresh_button">
-            <a href="{{ package.get_absolute_url}}check/">>>>Check package and list dependencies<<<</a>
+            <a id="refresh_package" href="#">Check package and list dependencies >>></a>
+			<div class="loading_space">Loading data...</div>
         </div>
 	</div>
 
@@ -75,17 +76,25 @@
 </div>
 
 <div id="right_release">
-	<h3>Changeset - changes from previous package: ({{ package.get_previous_package }})</h3>
+	<h3>Changeset:&nbsp;&nbsp {{ package.get_previous_package }} -> {{ package }}</h3>
 	<div id="release_side">
+		<div class="tip_text">Tip: Move mouse pointer over the list</div>
 		<ul>
 		{% for elem, components in release_notes.items %}
-			<li class="{% for component in components %}rn_{{component.id}} {% endfor %}" title="Commit from: {% for component in components %}{{component.artifactId}}:{{component.version}} {% endfor %} ">
+			<li class="{% for component in components %}rn_{{component.id}} {% endfor %}"
+				title="Commit from: {% for component in components %}{{component.artifactId}}:{{component.version}}
+				{% endfor %}">
 				{{ elem }}
 			</li>
 		{% endfor %}
 		</ul>
 	</div>
 </div>
+
+<script type="text/javascript">
+	var project_id={{ project.id }}
+	var package_id={{ package.id }}
+</script>
 
 
 {% endblock content %}
