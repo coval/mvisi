@@ -26,7 +26,7 @@
 				</thead>
 				<tbody>
 					{% for package in packages %}
-					<tr>
+					<tr class="{% cycle 'dark' 'light' %}">
 						<td>
 							<h3><a href="{{ package.get_absolute_url }}">{{ package.version }}</a></h3>
 						</td>

@@ -23,7 +23,7 @@
 		<div class="comp_table">
 			<table width="100%" cellspacing="0" cellpadding="0">
 				<thead>
-					<tr>
+					<tr id="cel-top">
 						<th>ArtifactId</th>
 						{% if package.get_previous_package %}
 							<th>Previous package<br /><a href="{{package.get_previous_package.get_absolute_url}}">({{ package.get_previous_package.version }})</a></th>
@@ -38,7 +38,7 @@
 				</thead>
 				<tbody>
 				{% for component in components %}
-				<tr>
+				<tr class="{% cycle 'dark' 'light' %}">
 					<td class="artid rn_{{component.id}}"><a href="{{component.get_absolute_url}}">{{ component.artifactId }}</a></td>
 					{% if package.get_previous_package %}
 						<td>{% ifequal component.version component.in_previous.version %}
