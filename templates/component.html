@@ -13,37 +13,39 @@
 <div id="main">
 	<h2><a href="/projects/">Component name: {{component.artifactId}}</a><span id="comp_version"> Version: {{component.version}}</span></h2>
 	<div id="refresh_comp_button">
-		<a id="refresh_component" href="#">check available other versions>>></a>
-		<div class="loading_space">Loading data...</div>
-		<div class="result"></div>
+		<a id="button_refresh" href="#">Refresh available versions</a>
 	</div>
 
-	<p><h3>Available in packages:</h3></p>
-	
-	<p>
-		<ul>
-			{% for package in component.package.all %}
-				<li>
-					<a href="{{package.get_absolute_url}}">{{package}}</a>
-				</li>
-			{% endfor %}
-		</ul>
-	</p>
 
-	<h3>SVN changes in this version:</h3>
-
-	<div id="rel_note">
+	<div id="available-in-package" class="ui-widget-content ui-corner-all">
+		<h3 class="ui-widget-header ui-corner-all">Available in packages:</h3>
+		
 		<p>
 			<ul>
-			{% for elem in release_notes %}
-				<li>{{ elem }}</li>
-			{% endfor %}
+				{% for package in component.package.all %}
+					<li>
+						<a href="{{package.get_absolute_url}}">{{package}}</a>
+					</li>
+				{% endfor %}
 			</ul>
 		</p>
 	</div>
+
+	<div id="rel_note" class="ui-widget-content ui-corner-all">
+		<h3 class="ui-widget-header ui-corner-all">SVN changes in this version:</h3>
+		<div id="rel_note_content">
+			<p>
+				<ul>
+				{% for elem in release_notes %}
+					<li>{{ elem }}</li>
+				{% endfor %}
+				</ul>
+			</p>
+		</div>
+	</div>
 	
-	<h3>Other versions of {{component.artifactId}}:</h3>
-	<div class="other_components">
+	<div id="other-components" class="ui-widget-content ui-corner-all">
+		<h3 class="ui-widget-header ui-corner-all">Other versions of {{component.artifactId}}:</h3>
 		<ul>
 		{% for comp in component.get_other_versions %}
 			<li>
@@ -55,7 +57,8 @@
 </div>
 
 
-<div id="side">
+<div id="side" class="ui-widget-content ui-corner-all">
+	<h3 class="ui-widget-header ui-corner-all">Component Info</h3>
 	<ul>
 		<li><a href="#"><strong>ArtifactId:</strong></a><br />{{component.artifactId}}</li>
 		<li><a href="#"><strong>GroupId:</strong></a><br />{{component.groupId}}</li>

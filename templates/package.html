@@ -10,12 +10,12 @@
 {% block content %}
 
 <div id="main">
-
-	<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}</a><span id=package_version>Package version: {{package.version}}</span></h2>
+	<div class="package_header">
+		<h2><a href="/projects/{{project.id}}/">Project name: {{project.name}}</a><span id=package_version>Package version: {{package.version}}</span></h2>
+	</div>
 	<div id="button_layer">
         <div id="refresh_button">
-            <a id="refresh_package" href="#">Check package and list dependencies >>></a>
-			<div class="loading_space">Loading data...</div>
+            <a id="refresh_package" href="#">Refresh dependencies</a>
         </div>
 	</div>
 
@@ -75,8 +75,8 @@
 	</div>
 </div>
 
-<div id="right_release">
-	<h3>Changeset:&nbsp;&nbsp {{ package.get_previous_package }} -> {{ package }}</h3>
+<div id="right_release" class="ui-widget-content ui-corner-all">
+	<h3 id="svn_changeset" class="ui-widget-header ui-corner-all">Changeset:&nbsp;&nbsp {{ package.get_previous_package }} -> {{ package }}</h3>
 	<div id="release_side">
 		<div class="tip_text">Tip: Move mouse pointer over the list</div>
 		<ul>
