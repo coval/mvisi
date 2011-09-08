@@ -65,8 +65,28 @@ $(document).ready(function() {
         });
     });
 
+
+    $("#refresh_project").click(function() {
+		$( "#refresh_project").button( "option", "disabled", true );
+		$( "#refresh_project").button( "option", "label", "Loading data ... " );
+		$( "#refresh_project").button( "option", "icons", {primary:'ui-icon-gear'} );
+		
+		$.ajax({
+		url: '/ajax/project/check/',
+		data: {'project_id': project_id },
+		success: function(data) {
+			//$(".loading_space").hide()
+			//$('.result').html(data);
+			location.reload();
+            }
+        });
+    });
+
+
+
 	$( "#button_refresh").button({ icons: {primary:'ui-icon-arrowrefresh-1-e'} });
 	$( "#refresh_package").button({ icons: {primary:'ui-icon-arrowrefresh-1-e'} });
+	$( "#refresh_project").button({ icons: {primary:'ui-icon-arrowrefresh-1-e'} });
 
 	
 	$("#refresh_package").click(function() {
@@ -76,7 +96,7 @@ $(document).ready(function() {
 		
 		$.ajax({
 		url: '/ajax/package/check/',
-		data: {'project_id': project_id, 'package_id': project_id },
+		data: {'project_id': project_id, 'package_id': package_id },
 		success: function(data) {
 			//$(".loading_space").hide()
 			//$('.result').html(data);

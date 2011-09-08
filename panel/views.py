@@ -15,7 +15,21 @@ from panel.models import Configuration, Project, Component, Package
 from panel.utils import parse_version, get_page, RNObject
 
 
+
+def ajax_package_available_versions(request):
+    if request.GET:
+        project_id = request.GET.get('project_id','')
+        project_id = int(project_id)
+        package_available_versions_inner(request, project_id)
+    
+    return HttpResponse("OK")
+
+
 def package_available_versions(request, project_id=1):
+    package_available_versions_inner(request, project_id)
+    return HttpResponseRedirect('/projects/%s/'%project_id)
+
+def package_available_versions_inner(request, project_id=1):
     """ Checks available project versions """
     project = Project.objects.get(id=int(project_id))
     page = get_page(project.get_mvn_metadata_url())
@@ -23,13 +37,14 @@ def package_available_versions(request, project_id=1):
     versions = soup.findAll('version')
     for version in versions:
         package, created = Package.objects.get_or_create(version=version.string, project=project)
+        package.get_tag_base()
     artifactId = soup.find('artifactid')
     groupId = soup.find('groupid')
     if not project.artifactId or not project.groupId:
         project.artifactId = artifactId.string if artifactId else ''
         project.groupId = groupId.string if groupId else ''
         project.save()
-    return HttpResponseRedirect('/projects/%s/'%project_id)
+    
 
 
 

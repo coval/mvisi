@@ -13,29 +13,31 @@
 <div id="main">
 
 	<h2><a href="/projects/">Project name: {{project.name}}</a></h2>
-	<a href="/projects/{{project.id}}/check/">>>>Check available packages<<<</a>
-	<p><h2>List of Packages</h2></p>
-	<div class="package_table">
-		<table width="100%" cellspacing="0" cellpadding="0">
-			<thead>
-				<tr>
-					<th><h3>Version</h3></th>
-					<th><h3>Release Date</h3></th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for package in packages %}
-				<tr>
-					<td>
-						<h3><a href="{{ package.get_absolute_url }}">{{ package.version }}</a></h3>
-					</td>
-					<td>
-						{{ package.get_svn_date }}
-					</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+	<a id="refresh_project" href="#">Check available packages</a>
+	<div id="package-list" class="ui-widget-content ui-corner-all">
+		<h3 class="ui-widget-header ui-corner-all">List of Packages</h3>
+		<div class="package_table">
+			<table width="100%" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th><h3>Version</h3></th>
+						<th><h3>Release Date</h3></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for package in packages %}
+					<tr>
+						<td>
+							<h3><a href="{{ package.get_absolute_url }}">{{ package.version }}</a></h3>
+						</td>
+						<td>
+							{{ package.get_svn_date }}
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 	</div>
 		
 
@@ -51,6 +53,9 @@
 		</ul>
 	</div>
 
+<script type="text/javascript">
+	var project_id={{ project.id }}
+</script>
 
 
 {% endblock content %}

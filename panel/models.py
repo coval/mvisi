@@ -71,7 +71,7 @@ class Package(models.Model):
 
 
     def get_svn_tag(self):
-        module_name = self.tagbase.split('/')[-1]
+        module_name = self.get_tag_base().split('/')[-1]
         return self.tagbase + "/" + self.project.artifactId + '-' + self.version
     
     def get_svn_date(self):

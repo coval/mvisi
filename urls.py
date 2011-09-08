@@ -28,6 +28,8 @@ urlpatterns = patterns('',
     # Ajax
     (r'^ajax/component/check/$', 'panel.views.ajax_check_available_components'),
     (r'^ajax/package/check/$', 'panel.views.ajax_check_package'),
+    (r'^ajax/project/check/$', 'panel.views.ajax_package_available_versions'),
+    
     
     
     
