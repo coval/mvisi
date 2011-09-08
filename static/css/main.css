@@ -80,7 +80,7 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
  .package_table table tbody tr td { padding: 2px 0 0 35px; }
  .package_table table thead tr th { padding: 2px 0 0 28px; text-align: justify;}
 
- .yellow { background-color: yellow;}
+ .yellow { background-color: yellow !important; }
  .blue { background-color: #e5e9f3;}
  .tip_text { position: absolute; top: 0; right:0; color: #808080; padding-right: 3px}
 #cel-top { border-radius: 10px; }
