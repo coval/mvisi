@@ -21,7 +21,8 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
 #menu li a:hover { color: #fff; }
 #menu li a.current { font-weight: bold; color: #fff; }
 
-#main { clear: left; float: left; width: 680px; min-height: 700px;} 
+#main { clear: left; float: left; width: 680px; min-height: 700px;}
+#main a { text-decoration: none; color: #008080; }
 #rel_note { background: #fff;}
 .l { float: left; width: 310px; }
 .r { float: right; width: 330px; }
