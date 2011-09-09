@@ -75,6 +75,8 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
  .comp_table table tr td.count { text-align: center; }
  .comp_table table tr td a { color: #; }
 
+ .table-art-id { border-right: 1px solid black; }
+
 
  .package_table { width: 50%; padding: 0; margin: 10px 10px 10px 0px;}
  .package_table table tbody tr td { padding: 2px 0 0 35px; }
@@ -104,7 +106,7 @@ h3 { font-size: 1.2em; margin: 0 0 6px; }
 #rel_note_content { padding: 0 0 0 15px;}
 #available-in-package { padding: 5px; margin: 50px 0 15px 0; }
 
-#package-list {padding: 5px; margin: 20px 0 0 0}
+#package-list {padding: 5px; margin: 20px 0 0 0; }
 .ui-widget-header {padding-left: 5px; padding-top: 3px; padding-bottom: 3px; box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); }
 .ui-widget-content {box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);}
 .ui-button-text {box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);}

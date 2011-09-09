@@ -3,7 +3,6 @@
 <head>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	
-	
 	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 	
 	<link href="http://code.jquery.com/ui/1.8.16/themes/redmond/jquery-ui.css" rel="stylesheet" type="text/css"/>
@@ -62,8 +61,6 @@ $(document).ready(function() {
 		url: '/ajax/component/check/',
 		data: {'component_id': comp_id },
 		success: function(data) {
-			//$(".loading_space").hide()
-			//$('.result').html(data);
 			location.reload();
             }
         });
@@ -79,8 +76,6 @@ $(document).ready(function() {
 		url: '/ajax/project/check/',
 		data: {'project_id': project_id },
 		success: function(data) {
-			//$(".loading_space").hide()
-			//$('.result').html(data);
 			location.reload();
             }
         });
@@ -102,15 +97,10 @@ $(document).ready(function() {
 		url: '/ajax/package/check/',
 		data: {'project_id': project_id, 'package_id': package_id },
 		success: function(data) {
-			//$(".loading_space").hide()
-			//$('.result').html(data);
 			location.reload();
             }
         });
     });
-	
-	
-    
 	
 	
     $("#release_side ul li").hover(function() {
@@ -122,7 +112,6 @@ $(document).ready(function() {
         $("td").filter(".artid").removeClass("yellow");
 		$("td").filter(".artid").filter(zm).addClass("yellow");
     });
-	
 	
 	
  });

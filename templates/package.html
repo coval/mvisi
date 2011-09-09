@@ -24,7 +24,7 @@
 			<table width="100%" cellspacing="0" cellpadding="0">
 				<thead>
 					<tr id="cel-top">
-						<th>ArtifactId</th>
+						<th id="table-art-id">ArtifactId</th>
 						{% if package.get_previous_package %}
 							<th>Previous package<br /><a href="{{package.get_previous_package.get_absolute_url}}">({{ package.get_previous_package.version }})</a></th>
 						{% endif %}

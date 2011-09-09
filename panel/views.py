@@ -35,18 +35,17 @@ def package_available_versions_inner(request, project_id=1):
     page = get_page(project.get_mvn_metadata_url())
     soup = BeautifulSoup(page)
     versions = soup.findAll('version')
-    for version in versions:
-        package, created = Package.objects.get_or_create(version=version.string, project=project)
-        package.get_tag_base()
     artifactId = soup.find('artifactid')
     groupId = soup.find('groupid')
     if not project.artifactId or not project.groupId:
         project.artifactId = artifactId.string if artifactId else ''
         project.groupId = groupId.string if groupId else ''
         project.save()
+    for version in versions:
+        package, created = Package.objects.get_or_create(version=version.string, project=project)
+        package.get_tag_base()
+
     
-
-
 
 def ajax_check_package(request):
     if request.GET:
@@ -70,6 +69,7 @@ def check_package_inner(request, project_id=1, package_id=1):
     package_id = int(package_id)
     project = Project.objects.get(id=project_id)
     package = Package.objects.get(id=package_id)
+    filtr = project.configuration.filter
     url = package.get_mvn_pom_url()
     
     local("rm -rf tempdir")
@@ -82,7 +82,7 @@ def check_package_inner(request, project_id=1, package_id=1):
     soup = BeautifulSoup(out)
     dep = soup.findAll('dependency')
     for d in dep:
-        if "com.nsn" in d.find('groupid').string:
+        if filtr in d.find('groupid').string:
             groupid = d.find('groupid').string
             artifactid = d.find('artifactid').string
             version = d.find('version').string
@@ -127,7 +127,6 @@ def projects_main(request):
     "Project list "
     c = dict()
     c['projects'] = Project.objects.all()
-    
     return render_to_response('projects.html', c)
 
 def project_view(request, project_id=1):
@@ -168,11 +167,8 @@ def show_package(request, project_id, package_id):
                         if new_messages.has_key(line):
                             ids = new_messages[line]
                             new_messages[line].append(all_components[ind])
-                            #new_messages[line] = "%s rn_%s"%(ids, all_components[ind].id)
                         else:
-                            #new_messages[line] = "rn_%s"%all_components[ind].id
                             new_messages[line] = [all_components[ind],]
-                            
         
         if previous_package not in component.package.all():
             for line in component.release_notes.splitlines():

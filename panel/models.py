@@ -18,7 +18,7 @@ class Configuration(models.Model):
     username = models.CharField(max_length=32, blank=True, help_text='Username for authorization to svn and maven repo')
     password = models.CharField(max_length=32, blank=True, help_text='Password for authorization to svn and maven repo')
     tempdir = models.CharField(max_length=32, blank=True)
-    filter = models.CharField(max_length=32, blank=True)
+    filter = models.CharField(max_length=32, blank=True, help_text='Restrict only to those groups. Ex. com.nsn')
 
     def __unicode__(self):
         return "Config: %s"%self.id
@@ -129,8 +129,10 @@ class Component(models.Model):
 
     def get_tag_base(self):
         from panel.utils import find_tagbase
-        #conf = self.package.project.configuration
-        conf = Configuration.objects.get(id=1)
+        try:
+            conf = self.package.all()[0].project.configuration
+        except:
+            conf = Configuration.objects.get(id=1)
         pom_url = self.get_mvn_pom_url()
         
         find_tagbase(pom_url, self)
@@ -138,7 +140,10 @@ class Component(models.Model):
 
     
     def get_mvn_url(self):
-        conf = Configuration.objects.get(id=1)
+        try:
+            conf = self.package.all()[0].project.configuration
+        except:
+            conf = Configuration.objects.get(id=1)
         short = self.groupId.replace('.','/') + '/' + self.artifactId
         return conf.mvnroot + short
     
@@ -180,7 +185,7 @@ class Component(models.Model):
         info = client.info2(new_tag+"/"+"pom.xml")
         return info[0][1]['last_changed_rev'].number
 
-    def compage_revisions(self, old_revision, new_revision):
+    def compare_revisions(self, old_revision, new_revision):
         from panel.utils import get_login, ssl_server_trust_prompt
         
         tag = self.get_svn_tag()
@@ -213,7 +218,7 @@ class Component(models.Model):
             try:
                 new_rev = self.get_svn_revision()
                 old_rev = self.get_svn_previous_revision()
-                log_ob = self.compage_revisions(new_rev, old_rev)
+                log_ob = self.compare_revisions(new_rev, old_rev)
                 for log in log_ob:
                     log_message += "%s\n"%(log['message'])
                     self.release_notes = log_message
