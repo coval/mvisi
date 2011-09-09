@@ -128,6 +128,8 @@ class Component(models.Model):
         return "/components/%s/"%self.id
 
     def get_tag_base(self):
+        if self.tagbase:
+            return self.tagbase
         from panel.utils import find_tagbase
         try:
             conf = self.package.all()[0].project.configuration
