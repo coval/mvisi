@@ -1,11 +1,12 @@
-Aim of this application is to provide visibility layer to maven projects.
+# What is Maven Visibility Tool
+
+Aim of this application is to provide visibility layer to projects managed by maven.
+Maven Visibility Tool is written in Python / Django
 
 # STORY
 Most of projects ends with one single maven project with list of deployment units in various versions. 
 For those kind of projects mvisi comes into picture.
 
-
-Maven Visibility Tool is written in Python / Django
 
 # DEMO
 http://visi.logwide.vot.pl/
