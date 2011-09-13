@@ -32,7 +32,7 @@ def package_available_versions(request, project_id=1):
 def package_available_versions_inner(request, project_id=1):
     """ Checks available project versions """
     project = Project.objects.get(id=int(project_id))
-    page = get_page(project.get_mvn_metadata_url())
+    page = get_page(project.get_mvn_metadata_url(), project.configuration.id)
     soup = BeautifulSoup(page)
     versions = soup.findAll('version')
     artifactId = soup.find('artifactid')
@@ -69,12 +69,13 @@ def check_package_inner(request, project_id=1, package_id=1):
     package_id = int(package_id)
     project = Project.objects.get(id=project_id)
     package = Package.objects.get(id=package_id)
+    configuration = project.configuration
     filtr = project.configuration.filter
     url = package.get_mvn_pom_url()
     
     local("rm -rf tempdir")
     local("mkdir tempdir")
-    page = get_page(package.get_mvn_pom_url())
+    page = get_page(package.get_mvn_pom_url(), project.configuration.id)
     f = open('tempdir/pom.xml','w')
     f.write(page)
     f.close()
@@ -86,7 +87,7 @@ def check_package_inner(request, project_id=1, package_id=1):
             groupid = d.find('groupid').string
             artifactid = d.find('artifactid').string
             version = d.find('version').string
-            component, created = Component.objects.get_or_create(name=artifactid, artifactId=artifactid,
+            component, created = Component.objects.get_or_create(name=artifactid, artifactId=artifactid, configuration=configuration,
                                                                  groupId=groupid, version=version)
             component.get_tag_base()
             component.package.add(package)

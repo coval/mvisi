@@ -38,7 +38,6 @@ class Project(models.Model):
     
     def get_mvn_url(self):
         conf = self.configuration
-        #conf = Configuration.objects.get(id=1)
         return conf.mvnroot + self.mvnpath
 
     def get_mvn_metadata_url(self):
@@ -52,8 +51,9 @@ class Package(models.Model):
     project = models.ForeignKey(Project)
     description = models.CharField(max_length=256, blank=True)
     version = models.CharField(max_length=256,)
-    tagbase = models.CharField(max_length=256, blank=True)
-    mvnpath = models.CharField(max_length=256, blank=True)
+    tagbase = models.CharField(max_length=512, blank=True)
+    svnpath = models.CharField(max_length=1025, blank=True)
+    mvnpath = models.CharField(max_length=512, blank=True)
     valid = models.CharField(max_length=256, blank=True)
     date = models.DateField(null=True)
     plaftorm_installation = models.CharField(max_length=256, blank=True)
@@ -67,7 +67,8 @@ class Package(models.Model):
     def get_tag_base(self):
         from panel.utils import find_tagbase
         pom_url = self.get_mvn_pom_url()
-        return find_tagbase(pom_url, self)
+        conf = self.project.configuration
+        return find_tagbase(pom_url, self, conf)
 
 
     def get_svn_tag(self):
@@ -119,10 +120,13 @@ class Component(models.Model):
     version = models.CharField(max_length=256, blank=True)
     package = models.ManyToManyField(Package, blank=True)
     tagbase = models.CharField(max_length=256, blank=True)
-    mvnpath = models.CharField(max_length=256, blank=True)
+    mvnpath = models.CharField(max_length=512, blank=True)
+    svnpath = models.CharField(max_length=1025, blank=True)
+    svntagpath = models.CharField(max_length=1025, blank=True)
     revision = models.IntegerField(null=True)
     date = models.DateField(null=True)
-    release_notes = models.TextField(max_length=2500, blank=True) #ToDo: zmienic na pole
+    release_notes = models.TextField(max_length=2500, blank=True)
+    configuration = models.ForeignKey(Configuration)
 
     def get_absolute_url(self):
         return "/components/%s/"%self.id
@@ -131,21 +135,15 @@ class Component(models.Model):
         if self.tagbase:
             return self.tagbase
         from panel.utils import find_tagbase
-        try:
-            conf = self.package.all()[0].project.configuration
-        except:
-            conf = Configuration.objects.get(id=1)
+        conf = self.configuration
         pom_url = self.get_mvn_pom_url()
         
-        find_tagbase(pom_url, self)
+        find_tagbase(pom_url, self, conf)
         return self.tagbase.replace(conf.svnroot,'')
 
     
     def get_mvn_url(self):
-        try:
-            conf = self.package.all()[0].project.configuration
-        except:
-            conf = Configuration.objects.get(id=1)
+        conf = self.configuration
         short = self.groupId.replace('.','/') + '/' + self.artifactId
         return conf.mvnroot + short
     
@@ -156,17 +154,36 @@ class Component(models.Model):
         return self.get_mvn_url() + "/" + self.version + "/" + self.artifactId + "-" + self.version + ".pom"
         
     def get_svn_tag(self):
-        #return self.tagbase + "/" + self.project.artifactId + '-' + self.version
-        module_name = self.tagbase.split('/')[-1]
-        return self.tagbase + "/" + module_name + '-' + self.version
+        if self.svntagpath:
+            return self.svntagpath
+        from panel.utils import get_login, ssl_server_trust_prompt
+        client = pysvn.Client()
+        client.callback_get_login = get_login
+        client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
+        dir_list = client.ls(str(self.tagbase))
+        for dir in dir_list:
+            if self.version in dir['name']:
+                print dir['name']
+                self.svntagpath = dir['name']
+                self.save()
+                return dir['name']
+        return ""
     
+   
     def get_svn_revision(self):
+        if self.revision:
+            return self.revision
         from panel.utils import get_login, ssl_server_trust_prompt
         client = pysvn.Client()
         client.callback_get_login = get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         if not self.revision or not self.date:
-            info = client.info2(self.get_svn_tag()+"/"+"pom.xml")
+            print self.get_svn_tag()+"/"+"pom.xml"
+            try:
+                info = client.info2(self.get_svn_tag()+"/"+"pom.xml")
+            except Exception, e:
+                print "Error getting revision: %s"%e
+                return ""
             self.revision = info[0][1]['last_changed_rev'].number
             date = info[0][1]['last_changed_date']
             self.date = datetime.date.fromtimestamp(date)
@@ -180,11 +197,16 @@ class Component(models.Model):
         client.callback_get_login = get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         
-        last_nr = self.get_svn_tag().split('.')[-1]
-        last_nr = int(last_nr) - 1
-        new_tag = self.get_svn_tag().split('.')[:-1]
-        new_tag = '.'.join(new_tag) + '.' + str(last_nr)
-        info = client.info2(new_tag+"/"+"pom.xml")
+        #self.get_available_components()
+        try:
+            last_nr = self.get_svn_tag().split('.')[-1]
+            last_nr = int(last_nr) - 1 #ToDo: refactor
+            new_tag = self.get_svn_tag().split('.')[:-1]
+            new_tag = '.'.join(new_tag) + '.' + str(last_nr)
+            info = client.info2(new_tag+"/"+"pom.xml")
+        except Exception, e:
+            print "Error getting previous revision: %s"%e
+            return ""
         return info[0][1]['last_changed_rev'].number
 
     def compare_revisions(self, old_revision, new_revision):
@@ -193,17 +215,26 @@ class Component(models.Model):
         tag = self.get_svn_tag()
         tag = tag.replace('tags','trunk').split('/')[:-1]
         svnpath = '/'.join(tag)
-        
+            
+        #svnpath = self.svnpath
+        #print svnpath
         client = pysvn.Client()
         client.callback_get_login = get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         
-        log = client.log(svnpath, revision_start=pysvn.Revision( pysvn.opt_revision_kind.number, old_revision ),
+        try:
+            log = client.log(svnpath, revision_start=pysvn.Revision( pysvn.opt_revision_kind.number, old_revision ),
+                            revision_end=pysvn.Revision( pysvn.opt_revision_kind.number, new_revision ))
+        except:
+            #Specyfic hack
+            tag[-1] = "mvn-%s"%tag[-1]
+            svnpath = '/'.join(tag)
+            print "New svnpath is: %s"%svnpath
+            log = client.log(svnpath, revision_start=pysvn.Revision( pysvn.opt_revision_kind.number, old_revision ),
                          revision_end=pysvn.Revision( pysvn.opt_revision_kind.number, new_revision ))
         return log
 
     def get_release_note(self):
-
         if self.release_notes:
             return self.release_notes
         log_ob=''
@@ -217,31 +248,29 @@ class Component(models.Model):
             self.save()
         if not self.release_notes or self.release_notes == '':
             log_message = ''
-            try:
-                new_rev = self.get_svn_revision()
-                old_rev = self.get_svn_previous_revision()
+            new_rev = self.get_svn_revision()
+            old_rev = self.get_svn_previous_revision()
+            
+            if new_rev and old_rev:
                 log_ob = self.compare_revisions(new_rev, old_rev)
                 for log in log_ob:
                     log_message += "%s\n"%(log['message'])
                     self.release_notes = log_message
                     self.save()
-            except Exception, e:
-                print("Error in getting release note: %s"%e)
-                return ""
         
         return self.release_notes
 
     def check_available_components(self):
         from panel.utils import get_page
-        page = get_page(self.get_mvn_metadata_url())
+        page = get_page(self.get_mvn_metadata_url(), self.configuration.id)
         soup = BeautifulSoup(page)
         versions = soup.findAll('version')
         for version in versions:
             new_comp, created = Component.objects.get_or_create(name=self.name, artifactId=self.artifactId, version=version.string,
-                                                               groupId=self.groupId)
+                                                               groupId=self.groupId, configuration=self.configuration)
             new_comp.tagbase=self.tagbase
             new_comp.save()
-        self.get_tag_base()
+        #self.get_tag_base()
         return ''
     
     def get_available_components(self):
@@ -280,10 +309,6 @@ class Component(models.Model):
                 components.append(c)
         components = sorted(components, key=lambda component: parse_version(component.version), reverse=True)
         return components
-
-
-    def check_tag_base(self):
-        pass
 
 
     def __unicode__(self):

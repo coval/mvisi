@@ -73,15 +73,21 @@ def get_page(url, conf_id=1):
     response.close()
     return the_page
 
-def find_tagbase(pom, component):
+def find_tagbase(pom, component, conf):
+    """ Getting tagbase for component or package"""
     if component.tagbase:
         return component.tagbase
-    conf = Configuration.objects.get(id=1)
-    #conf = component.package.all()[0].project.configuration
-    print(pom)
-    page = get_page(pom)
+    
+    page = get_page(pom, conf.id)
     soup = BeautifulSoup(page)
     tagbase = soup.find('tagbase')
+    scm = soup.find('scm')
+    if scm:
+        scm = scm.find('connection').string
+        scm = scm.replace("scm:svn:",'')
+        component.svntagpath = scm
+        component.save()
+    
     if not tagbase:
         try:
             version = soup.project.find('parent').version.string if soup.project.find('parent').version.string else soup.project.version.string
@@ -93,7 +99,7 @@ def find_tagbase(pom, component):
         if not artifactid:
             return ''
         new_pom = conf.mvnroot + groupid.replace('.','/') + '/' + artifactid + '/' + version + "/" + artifactid + "-" + version + ".pom"
-        find_tagbase(new_pom, component)
+        find_tagbase(new_pom, component, conf)
     else:
         print tagbase.string
         component.tagbase = tagbase.string
