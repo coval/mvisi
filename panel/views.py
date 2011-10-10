@@ -15,7 +15,6 @@ from panel.models import Configuration, Project, Component, Package
 from panel.utils import parse_version, get_page, RNObject
 
 
-
 def ajax_package_available_versions(request):
     if request.GET:
         project_id = request.GET.get('project_id','')
@@ -84,9 +83,10 @@ def check_package_inner(request, project_id=1, package_id=1):
     dep = soup.findAll('dependency')
     for d in dep:
         if filtr in d.find('groupid').string:
-            groupid = d.find('groupid').string
-            artifactid = d.find('artifactid').string
-            version = d.find('version').string
+            groupid = str(d.find('groupid').string)
+            artifactid = str(d.find('artifactid').string)
+            version = str(d.find('version').string)
+            
             component, created = Component.objects.get_or_create(name=artifactid, artifactId=artifactid, configuration=configuration,
                                                                  groupId=groupid, version=version)
             component.get_tag_base()
@@ -104,8 +104,6 @@ def check_package_inner(request, project_id=1, package_id=1):
             #ToDo: wyniesc to do ajaxa
             component.check_available_components()
     return 
-    #return HttpResponseRedirect('/projects/%s/packages/%s/'%(project_id, package_id))
-
 
 
 def ajax_check_available_components(request):

@@ -70,6 +70,11 @@ class Package(models.Model):
         conf = self.project.configuration
         return find_tagbase(pom_url, self, conf)
 
+    def __get_login(self, *some_vars):
+        from panel.utils import get_login
+        conf = self.project.configuration
+        return get_login(conf)
+
 
     def get_svn_tag(self):
         module_name = self.get_tag_base().split('/')[-1]
@@ -78,9 +83,9 @@ class Package(models.Model):
     def get_svn_date(self):
         if self.date:
             return self.date
-        from panel.utils import get_login, ssl_server_trust_prompt
+        from panel.utils import ssl_server_trust_prompt
         client = pysvn.Client()
-        client.callback_get_login = get_login
+        client.callback_get_login = self.__get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         info = client.info2(self.get_svn_tag()+"/"+"pom.xml")
         self.revision = info[0][1]['last_changed_rev'].number
@@ -132,12 +137,11 @@ class Component(models.Model):
         return "/components/%s/"%self.id
 
     def get_tag_base(self):
-        if self.tagbase:
-            return self.tagbase
-        from panel.utils import find_tagbase
         conf = self.configuration
+        if self.tagbase:
+            return self.tagbase.replace(conf.svnroot,'')
+        from panel.utils import find_tagbase
         pom_url = self.get_mvn_pom_url()
-        
         find_tagbase(pom_url, self, conf)
         return self.tagbase.replace(conf.svnroot,'')
 
@@ -152,13 +156,19 @@ class Component(models.Model):
 
     def get_mvn_pom_url(self):
         return self.get_mvn_url() + "/" + self.version + "/" + self.artifactId + "-" + self.version + ".pom"
-        
+    
+    def __get_login(self, *some_vars):
+        from panel.utils import get_login
+        conf = self.configuration
+        return get_login(conf)
+    
+    
     def get_svn_tag(self):
         if self.svntagpath:
             return self.svntagpath
-        from panel.utils import get_login, ssl_server_trust_prompt
+        from panel.utils import ssl_server_trust_prompt
         client = pysvn.Client()
-        client.callback_get_login = get_login
+        client.callback_get_login = self.__get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         dir_list = client.ls(str(self.tagbase))
         for dir in dir_list:
@@ -173,9 +183,9 @@ class Component(models.Model):
     def get_svn_revision(self):
         if self.revision:
             return self.revision
-        from panel.utils import get_login, ssl_server_trust_prompt
+        from panel.utils import ssl_server_trust_prompt
         client = pysvn.Client()
-        client.callback_get_login = get_login
+        client.callback_get_login = self.__get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         if not self.revision or not self.date:
             print self.get_svn_tag()+"/"+"pom.xml"
@@ -192,9 +202,9 @@ class Component(models.Model):
 
     def get_svn_previous_revision(self):
         "Revision of previously released component"
-        from panel.utils import get_login, ssl_server_trust_prompt
+        from panel.utils import ssl_server_trust_prompt
         client = pysvn.Client()
-        client.callback_get_login = get_login
+        client.callback_get_login = self.__get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         
         #self.get_available_components()
@@ -210,7 +220,7 @@ class Component(models.Model):
         return info[0][1]['last_changed_rev'].number
 
     def compare_revisions(self, old_revision, new_revision):
-        from panel.utils import get_login, ssl_server_trust_prompt
+        from panel.utils import ssl_server_trust_prompt
         
         tag = self.get_svn_tag()
         tag = tag.replace('tags','trunk').split('/')[:-1]
@@ -219,7 +229,7 @@ class Component(models.Model):
         #svnpath = self.svnpath
         #print svnpath
         client = pysvn.Client()
-        client.callback_get_login = get_login
+        client.callback_get_login = self.__get_login
         client.callback_ssl_server_trust_prompt = ssl_server_trust_prompt
         
         try:
@@ -270,7 +280,6 @@ class Component(models.Model):
                                                                groupId=self.groupId, configuration=self.configuration)
             new_comp.tagbase=self.tagbase
             new_comp.save()
-        #self.get_tag_base()
         return ''
     
     def get_available_components(self):

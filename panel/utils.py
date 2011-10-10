@@ -43,16 +43,10 @@ def parse_version(s):
     return tuple(parts)
 
 
-def get_login( *some_vars ):
+def get_login( conf ):
     """ Function for pysvn callback """
-    #ToDo: better password corelation with proper configurations
-    try:
-        conf = Configuration.objects.get(id=1)
-        username = conf.username
-        password = conf.password
-    except Exception, e:
-        username = ''
-        password = ''
+    username = conf.username
+    password = conf.password
     return True, username, password, True
 
 
@@ -84,7 +78,8 @@ def find_tagbase(pom, component, conf):
     scm = soup.find('scm')
     if scm:
         scm = scm.find('connection').string
-        scm = scm.replace("scm:svn:",'')
+        scm = scm.replace("scm:svn:",'').strip()
+        print scm
         component.svntagpath = scm
         component.save()
     
