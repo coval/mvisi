@@ -11,12 +11,12 @@
 {% block content %}
 
 <div id="main">
-	<div class="l">
-		<h2>List of Projects</h2>
+	<div id="project-list" class="ui-widget-content ui-corner-all">
+		<h3 class="ui-widget-header ui-corner-all">List of Projects</h3>
 		
 		<ul>
 		{% for project in projects %}
-			<li>
+			<li class="{% cycle 'light' 'dark' %}">
 				<p><h3><a href="{{project.get_absolute_url}}">{{ project.name }}</a></h3> 
 					{{ project.description }}
 				</p>

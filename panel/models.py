@@ -106,7 +106,7 @@ class Package(models.Model):
         try:
             new_suffix = int(new_version[-1]) + factor
             new_version = '.'.join(new_version[:-1]) + '.' + str(new_suffix)
-            new_version = Package.objects.get(version=new_version)
+            new_version = Package.objects.get(project = self.project, version=new_version)
         except Exception, e:
             new_version = ''
         return new_version
