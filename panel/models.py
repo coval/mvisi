@@ -102,14 +102,16 @@ class Package(models.Model):
     
     
     def get_other_package(self, factor=1):
-        new_version = self.version.split('.')
+        """ To be changed """
+        from panel.views import parse_version
+        packages = Package.objects.filter(project = self.project)
+        packages = sorted(packages, key=lambda package: parse_version(package.version), reverse=False)
+        indeks = packages.index(self)
         try:
-            new_suffix = int(new_version[-1]) + factor
-            new_version = '.'.join(new_version[:-1]) + '.' + str(new_suffix)
-            new_version = Package.objects.get(project = self.project, version=new_version)
+            return packages[indeks + factor]
         except Exception, e:
-            new_version = ''
-        return new_version
+            return ''
+
     
     def get_previous_package(self):
         return self.get_other_package(factor = -1)
